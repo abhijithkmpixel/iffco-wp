@@ -84,15 +84,16 @@ function theme_scripts() {
     wp_enqueue_script( 'theme-jquery', get_template_directory_uri() . '/assets/js/jquery.min.js', array(), _S_VERSION, true );
     wp_enqueue_script( 'theme-plugins', get_template_directory_uri() . '/assets/js/plugins.min.js', array(), _S_VERSION, true );
     wp_enqueue_script( 'theme-app', get_template_directory_uri() . '/assets/js/app.min.js', array(), _S_VERSION, true );
-    wp_enqueue_script( 'theme-forms', get_template_directory_uri() . '/assets/js/forms.min.js', array(), _S_VERSION, true );
+    // wp_enqueue_script( 'theme-forms', get_template_directory_uri() . '/assets/js/forms.min.js', array(), _S_VERSION, true );
     wp_enqueue_script( 'theme-custom-js', get_template_directory_uri() . '/js/custom.js', array(), _S_VERSION, true );
-    wp_enqueue_script( 'video-player', get_template_directory_uri() . '/js/custom-player.js', array(), _S_VERSION, true );
+    // wp_enqueue_script( 'video-player', get_template_directory_uri() . '/js/custom-player.js', array(), _S_VERSION, true );
 }
 add_action( 'wp_enqueue_scripts', 'theme_scripts' );
 
 // custom functions
     require get_template_directory() . '/includes/custom.php';
     require get_template_directory() . '/includes/image-sizes.php';
+    require get_template_directory() . '/includes/cpt/news.php';
 // custom functions end
 
 // CPT
