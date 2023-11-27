@@ -94,6 +94,7 @@ add_action( 'wp_enqueue_scripts', 'theme_scripts' );
     require get_template_directory() . '/includes/custom.php';
     require get_template_directory() . '/includes/image-sizes.php';
     require get_template_directory() . '/includes/cpt/news.php';
+    require get_template_directory() . '/includes/cpt/brands.php';
 // custom functions end
 
 // CPT
