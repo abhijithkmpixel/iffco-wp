@@ -8,8 +8,9 @@
                                 $banner__title = get_field("banner_title");
                                 $banner__subtitle = get_field("banner_subtitle");
                                 $banner__subtitle_bold = get_field("banner_subtitle_bold");
+                                $banner__image__type = get_field("banner_content_type_image");
                                 $banner__image = get_field("banner_content_image");
-                                $banner__image__url = esc_url($banner__image['url']);
+                                $banner__image__url = $banner__image ? esc_url($banner__image['url']) : null;
                                 $banner__background__image = get_field("banner_background_image");
                                 $banner__background__image__url = esc_url($banner__background__image['url']);
 
@@ -36,15 +37,21 @@
                                     echo ' hero__banner--traceable--score ';
                                 }
                                 ?>
-                                " style="--bg-color: <?php $banner__bg__color; ?>); ?>">
+                                " style="--bg-color: <?php echo $banner__bg__color; ?>;">
+
+    <?php if ($traceability__banner == true) : ?>
+        <span class="float__element"></span>
+    <?php endif; ?>
+
+
     <div class="container">
         <div class="hero__banner__content">
 
 
-            <?php if ($banner__image) : ?>
-                <img src="<?php echo $banner__background__image__url; ?>" alt="<?php if ($banner__background__image) {
-                                                                                    echo esc_attr($banner__background__image['alt']);
-                                                                                } ?>" />
+            <?php if ($banner__image && $banner__image__type == true) : ?>
+                <img src="<?php echo $banner__image__url; ?>" alt="<?php if ($banner__image) {
+                                                                        echo esc_attr($banner__image['alt']);
+                                                                    } ?>" />
             <?php endif; ?>
             <?php if ($banner__title) : ?>
                 <h1>
@@ -84,21 +91,22 @@
 
         </div>
     </div>
-    <img src="<?php echo $banner__image__url; ?>" alt="<?php if ($banner__image) {
-                                                            echo esc_attr($banner__image['alt']);
-                                                        } ?>" />
+    <img src="<?php echo esc_url($banner__background__image['url']); ?>" alt="<?php if ($banner__background__image) {
+                                                                                    echo esc_attr($banner__background__image['alt']);
+                                                                                } ?>" />
 
 
 
     <?php if (have_rows('banner_flexi_cards')) : ?>
         <div class="overlay__grid__wrap">
             <?php while (have_rows('banner_flexi_cards')) : the_row();
-                $card__background = get_sub_field('card_background_image');
+                $card__background__image = get_sub_field('card_background_image');
                 $card__background__color = get_sub_field('card_background_color');
                 $card__type = get_sub_field('card_type');
                 $card__carousel = get_sub_field('card_carousel');
                 $card__title = get_sub_field('title');
                 $card__subtitle = get_sub_field('subtitle');
+                $card__subtitle__color__white = get_sub_field('subtitle_color_white');
                 $card__counter = get_sub_field('card_counter');
                 $card__title__postfix = get_sub_field('card_title_postfix');
                 $card__singleicon = get_sub_field('single_icon');
@@ -109,36 +117,36 @@
                 $card__empty__bg__color = get_sub_field('empty_placeholder_color');
                 $card__icon__align = get_sub_field('card_icon_align');
             ?>
-                <div class="overlay__grid__wrap__item <?php if ($card__empty__bg == true) {
-                                                            echo 'overlay__grid__wrap__item--empty--card3';
-                                                        } ?>
-                                                        <?php if ($card__diagonal__line == true && $card__diagonal__line__type == true) {
-                                                            echo 'overlay__grid__wrap__item--lines';
+                <div class="overlay__grid__wrap__item <?php
+                                                        if ($card__empty__bg == true) {
+                                                            echo ' overlay__grid__wrap__item--empty--card3 ';
+                                                        }
+
+                                                        if ($card__diagonal__line == true && $card__diagonal__line__type == true) {
+                                                            echo ' overlay__grid__wrap__item--lines ';
                                                         } else if ($card__diagonal__line == true && $card__diagonal__line__type == false) {
-                                                            echo 'overlay__grid__wrap__item--lines2';
+                                                            echo ' overlay__grid__wrap__item--lines2 ';
                                                         }
                                                         ?>
-                                                        " style="--card-bg: <?php echo $card__background__color; ?>;
-                                                        <?php
-                                                        if ($card__empty__bg == true) {
-                                                            echo '--empty-color:' + $card__empty__bg__color;
-                                                        }
-                                                        if ($card__empty__bg == true) {
-                                                            echo '--line-color:' + $card__diagonal__line__color;
-                                                        }
-                                                        ?>
+                                                     
+                                                        " style="--card-bg: <?php echo $card__background__color;
+                                                                            ?>;--line-color:<?php echo $card__diagonal__line__color ?>;
+                                                                            --empty-color:<?php echo $card__empty__bg__color ?>
+                                                                            
                                                         ">
-                    <?php if ($card__background) : ?>
-                        <img src="<?php echo esc_url($card__background['url']); ?>" alt="<?php if ($card__background) {
-                                                                                                echo esc_attr($card__background['alt']);
-                                                                                            } ?>" class="overlay__grid__wrap__item__bg" />
+                    <?php if ($card__background__image) : ?>
+                        <img src="<?php echo esc_url($card__background__image['url']); ?>" alt="<?php if ($card__background__image) {
+                                                                                                    echo esc_attr($card__background__image['alt']);
+                                                                                                } ?>" class="overlay__grid__wrap__item__bg" />
                     <?php endif; ?>
 
                     <div class="overlay__grid__wrap__item__header">
                         <?php if ($card__type == true) : ?>
                             <?php if ($card__title) : ?>
                                 <h3>
-                                    <?php if ($card__counter == true) : ?>
+                                    <?php
+                                    if ($card__counter == true) :
+                                    ?>
                                         <span class="counters" data-number="<?php echo $card__title; ?>">
                                         <?php endif; ?>
                                         <?php echo $card__title; ?>
@@ -150,7 +158,9 @@
                             <?php endif; ?>
 
                             <?php if ($card__subtitle) : ?>
-                                <h5><?php echo $card__subtitle; ?></h5>
+                                <h5 class="<?php if ($card__subtitle__color__white == true) {
+                                                echo 'text-white';
+                                            } ?>"><?php echo $card__subtitle; ?></h5>
                             <?php endif; ?>
                         <?php else : ?>
 
@@ -161,6 +171,7 @@
                                     <?php $card__carousel__index = 1;
                                     while (have_rows('card_carousel')) : the_row();
                                         $card__title = get_sub_field('title');
+                                        $card__title__postfix = get_sub_field('title_postfix');
                                         $card__subtitle = get_sub_field('subtitle');
                                         $card__icon = get_sub_field('icon');
                                     ?>
@@ -180,7 +191,9 @@
                                                 </h3>
                                             <?php endif; ?>
                                             <?php if ($card__subtitle) : ?>
-                                                <h5><?php echo $card__subtitle; ?></h5>
+                                                <h5 class="<?php if ($card__subtitle__color__white == true) {
+                                                                echo 'text-white';
+                                                            } ?>"><?php echo $card__subtitle; ?></h5>
                                             <?php endif; ?>
                                         </div>
                                     <?php $card__carousel__index++;
@@ -192,10 +205,10 @@
                     </div>
 
                     <div class="overlay__grid__wrap__item__footer__icon <?php if ($card__icon__align == true) {
-                                                                            echo 'ms-auto';
+                                                                            echo ' ms-auto ';
                                                                         } ?>">
                         <?php if ($card__type == true) : ?>
-                            <img src="<?php echo $esc_url($card__singleicon['url']); ?>" alt="<?php if ($card__singleicon) {
+                            <img src="<?php echo esc_url($card__singleicon['url']); ?>" alt="<?php if ($card__singleicon) {
                                                                                                     echo esc_attr($card__singleicon['alt']);
                                                                                                 } ?>" />
                         <?php else : ?>
@@ -204,12 +217,12 @@
                                 <div class="overlay__grid__wrap__item__footer__icon__carousel">
                                     <?php $card__icon__carousel__index = 1;
                                     while (have_rows('card_carousel')) : the_row();
-                                        $image = get_sub_field('image');
+                                        $cardicon = get_sub_field('icon');
                                     ?>
                                         <div class="overlay__grid__wrap__item__footer__icon__carousel__item <?php if ($card__icon__carousel__index != 1) {
                                                                                                                 echo 'hidden';
                                                                                                             } ?> ">
-                                            <img src="./uploads/qf/globe.svg" alt="" />
+                                            <img src="<?php echo esc_url($cardicon['url']); ?>" alt="<?php echo esc_attr($cardicon['alt']); ?>" />
                                         </div>
                                     <?php $card__icon__carousel__index++;
                                     endwhile; ?>
@@ -227,295 +240,376 @@
     <?php endif; ?>
 
 </section>
+
 <section class="our__brands__showcase">
     <div class="container">
-        <h2 class="title__primary text-center">Our Brands</h2>
-        <div class="our__brands__showcase__slider">
-            <div class="brand__slide">
-                <img src="./uploads/home/1.png" alt="" />
+        <h2 class="title__primary text-center"><?php the_field("brands_title"); ?></h2>
+
+
+
+        <?php
+        $brands__slider = get_field('brands_slider');
+        if ($brands__slider) : ?>
+            <div class="our__brands__showcase__slider">
+                <?php foreach ($brands__slider as $post) :
+
+                    // Setup this post for WP functions (variable must be named $post).
+                    setup_postdata($post);
+                    $logo = get_field('brand_logo');
+                ?>
+                    <div class="brand__slide">
+                        <img src="<?php echo esc_url($logo['url']); ?>" alt="<?php echo esc_attr($logo['alt']); ?>" />
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/2.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/3.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/4.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/2.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/3.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/4.png" alt="" />
-            </div>
-            <div class="brand__slide">
-                <img src="./uploads/home/5.png" alt="" />
-            </div>
-        </div>
+            <?php
+            // Reset the global post object so that the rest of the page works correctly.
+            wp_reset_postdata(); ?>
+        <?php endif; ?>
+
         <h4 class="sub__title text-center">
 
             <strong>
 
-                Our brands span over 20 food and personal care categories.
-                <br />
-
-                We also have significant presence in packaging, sales and distribution,
-
-                chemicals and logistics.
+                <?php the_field("brands_subtitle"); ?>
 
             </strong>
 
         </h4>
-        <a href="#" class="cta__primary mx-auto">See all of our brands
 
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <?php
+        $brandsCTA = get_field('brands_cta');
+        if ($brandsCTA) :
+            $link_url = $brandsCTA['url'];
+            $link_title = $brandsCTA['title'];
+            $link_target = $brandsCTA['target'] ? $brandsCTA['target'] : '_self';
+        ?>
+            <a class="cta__primary mx-auto" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
+                    <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
 
-            </svg>
-
-        </a>
+                </svg></a>
+        <?php endif; ?>
     </div>
 </section>
+
 <section class="news_and_events">
     <div class="container">
-        <h2 class="title__primary text-center">News & Events</h2>
-        <div class="row news_and_events__row">
-            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <a href="#" class="news__and__events__card">
+        <h2 class="title__primary text-center"><?php the_field("news_title"); ?></h2>
 
-                    <img src="./uploads/home/n1.png" alt="" />
 
-                    <div class="news__and__events__card__body">
+        <?php
+        $featured_news = get_field('news_list');
+        if ($featured_news) : ?>
+            <div class="row news_and_events__row">
+                <?php foreach ($featured_news as $post) :
 
-                        <h4>
+                    // Setup this post for WP functions (variable must be named $post).
+                    setup_postdata($post);
+                    // $newstitle = get_title();
+                    // $newsexcerpt = get_excerpt();
+                    $newslistimage = get_field("listing_image");
+                ?>
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                        <a href="<?php the_permalink(); ?>" class="news__and__events__card">
 
-                            Guardex wins best marketing campaign of the year at the beauty
+                            <img src="<?php echo esc_url($newslistimage['url']); ?>" alt="<?php echo esc_attr($newslistimage['alt']); ?>" />
 
-                            world middle east awards
+                            <div class="news__and__events__card__body">
 
-                        </h4>
+                                <h4>
 
-                        <p>
+                                    <?php the_title(); ?>
 
-                            IFFCO won the top honor in three categories: Country winner for
+                                </h4>
 
-                            the best ESG project in the UE, Best.
+                                <p>
 
-                        </p>
+                                    <?php the_excerpt(); ?>
 
+
+                                </p>
+
+                            </div>
+
+                        </a>
                     </div>
-
-                </a>
+                <?php endforeach; ?>
             </div>
-            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <a href="#" class="news__and__events__card">
+            <?php
+            // Reset the global post object so that the rest of the page works correctly.
+            wp_reset_postdata(); ?>
+        <?php endif; ?>
+        <?php
+        $newsCTA = get_field('news_cta');
+        if ($newsCTA) :
+            $link_url = $newsCTA['url'];
+            $link_title = $newsCTA['title'];
+            $link_target = $newsCTA['target'] ? $brandsCTA['target'] : '_self';
+        ?>
+            <a class="cta__primary mx-auto" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                    <img src="./uploads/home/n2.png" alt="" />
+                    <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
 
-                    <div class="news__and__events__card__body">
-
-                        <h4>Savannah wins product of the Year 2021 award.</h4>
-
-                        <p>
-
-                            Savannah continues to be recognized as the market leader in the
-
-                            personal care category.
-
-                        </p>
-
-                    </div>
-
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <a href="#" class="news__and__events__card">
-
-                    <img src="./uploads/home/n3.png" alt="" />
-
-                    <div class="news__and__events__card__body">
-
-                        <h4>It can't get more cheesilicious than this</h4>
-
-                        <p>
-
-                            Noor cheese sauce won the Product of the year awards. These awards
-
-                            are the only consumer-voted awards in the region, and Nielson, a
-
-                            global research company, conducts the research.
-
-                        </p>
-
-                    </div>
-
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                <a href="#" class="news__and__events__card">
-
-                    <img src="./uploads/home/n4.png" alt="" />
-
-                    <div class="news__and__events__card__body">
-
-                        <h4>AL Baker is one of the most chosen food brands in the UAE</h4>
-
-                        <p>
-
-                            In the UAE, AL Baker hs entered the top ten most chosen brands nd
-
-                            is among the top 5 penetration gainers according to Kantar Brand
-
-                            footprint Report 2021.
-
-                        </p>
-
-                    </div>
-
-                </a>
-            </div>
-        </div>
-        <a href="#" class="cta__primary mx-auto">More news & events
-
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
-
-            </svg>
-
-        </a>
+                </svg></a>
+        <?php endif; ?>
     </div>
 </section>
-<section class="hero__banner" style="--bg-color: #79be43">
+<section class="hero__banner <?php
+                                $banner__bg__color2 = get_field("banner_background_color_2");
+                                $banner__title2 = get_field("banner_title_2");
+                                $banner__subtitle2 = get_field("banner_subtitle_2");
+                                $banner__subtitle_bold2 = get_field("banner_subtitle_bold_2");
+                                $banner__image__type2 = get_field("banner_content_type_image_2");
+                                $banner__image2 = get_field("banner_content_image_2");
+                                $banner__image__url2 = $banner__image2 ? esc_url($banner__image2['url']) : null;
+                                $banner__background__image2 = get_field("banner_background_image_2");
+                                $banner__background__image__url2 = esc_url($banner__background__image2['url']);
+
+                                $static__banner2 = get_field('banner_background_static_image_2');
+                                $inverted__banner2 = get_field('banner_inverted_2');
+                                $with__image2 = get_field('banner_content_type_image_2');
+                                $sustainability__banner2 = get_field('banner_for_sustainability_page_2');
+                                $traceability__banner2 = get_field('banner_for_traceable_score_page_2');
+
+                                if ($static__banner2 == true) {
+                                    echo ' hero__banner--static--img ';
+                                }
+
+                                if ($inverted__banner2 == true) {
+                                    echo ' hero__banner--inverted ';
+                                }
+                                if ($with__image == true) {
+                                    echo ' hero__banner--with--image ';
+                                }
+                                if ($sustainability__banner2 == true) {
+                                    echo ' hero__banner--sustainability ';
+                                }
+                                if ($traceability__banner2 == true) {
+                                    echo ' hero__banner--traceable--score ';
+                                }
+                                ?>
+                                " style="--bg-color: <?php echo $banner__bg__color2; ?>;">
+
+    <?php if ($traceability__banner2 == true) : ?>
+        <span class="float__element"></span>
+    <?php endif; ?>
+
+
     <div class="container">
         <div class="hero__banner__content">
-            <h1>Sustainability</h1>
-            <p>
-                <strong>
 
-                    Sustainability is increasingly at the heart of all our business
 
-                    operations. Learn more about our sustainability strategy and the
+            <?php if ($banner__image2 && $banner__image__type2 == true) : ?>
+                <img src="<?php echo $banner__image__url2; ?>" alt="<?php if ($banner__image2) {
+                                                                        echo esc_attr($banner__image2['alt']);
+                                                                    } ?>" />
+            <?php endif; ?>
+            <?php if ($banner__title2) : ?>
+                <h1>
+                    <?php echo $banner__title2; ?>
+                </h1>
+            <?php endif; ?>
 
-                    difference it is making to the community and our business.
+            <?php if ($banner__subtitle2) : ?>
+                <p>
+                    <?php if ($banner__subtitle_bold2 == true) {
+                        echo "<strong>";
+                    } ?>
+                    <?php echo $banner__subtitle2; ?>
+                    <?php if ($banner__subtitle_bold2 == true) {
+                        echo "</strong>";
+                    } ?>
+                </p>
+            <?php endif; ?>
 
-                </strong>
-            </p>
-            <div class="hero__banner__content__btn__wrap">
-                <a href="#" class="cta__primary">Sustainability at IFFCO
 
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <?php if (have_rows('banner_cta_row_2')) : ?>
+                <div class="hero__banner__content__btn__wrap">
+                    <?php while (have_rows('banner_cta_row_2')) : the_row();
+                        $cta2 = get_sub_field('cta');
+                        $link_url = $cta2['url'];
+                        $link_title = $cta2['title'];
+                        $link_target = $cta2['target'] ? $cta2['target'] : '_self';
+                    ?>
+                        <a class="cta__primary cta__primary--light-" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                        <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
-                    </svg>
-                </a>
-            </div>
+                                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
+                            </svg></a>
+
+                    <?php endwhile; ?>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
-    <img src="./uploads/home/bg2.png" alt="" />
-    <!-- <div class="overlay__grid__wrap">
+    <img src="<?php echo esc_url($banner__background__image2['url']); ?>" alt="<?php if ($banner__background__image2) {
+                                                                                    echo esc_attr($banner__background__image2['alt']);
+                                                                                } ?>" />
 
-    <div class="overlay__grid__wrap__item" style="--card-bg: #007948">
 
-      <img
 
-        src="./uploads/og/og12.png"
+    <?php if (have_rows('banner_flexi_cards_2')) : ?>
+        <div class="overlay__grid__wrap">
+            <?php while (have_rows('banner_flexi_cards_2')) : the_row();
+                $card__background__image2 = get_sub_field('card_background_image_2');
+                $card__background__color2 = get_sub_field('card_background_color_2');
+                $card__type2 = get_sub_field('card_type_2');
+                $card__carousel2 = get_sub_field('card_carousel_2');
+                $card__title2 = get_sub_field('title_2');
+                $card__subtitle2 = get_sub_field('subtitle_2');
+                $card__subtitle__color__white2 = get_sub_field('subtitle_color_white_2');
+                $card__counter2 = get_sub_field('card_counter_2');
+                $card__title__postfix2 = get_sub_field('card_title_postfix_2');
+                $card__singleicon2 = get_sub_field('single_icon_2');
+                $card__diagonal__line2 = get_sub_field('diagonal_line_2');
+                $card__diagonal__line__type2 = get_sub_field('diagonal_line_type_2');
+                $card__diagonal__line__color2 = get_sub_field('diagonal_line_color_2');
+                $card__empty__bg2 = get_sub_field('empty_placeholder_2');
+                $card__empty__bg__color2 = get_sub_field('empty_placeholder_color_2');
+                $card__icon__align2 = get_sub_field('card_icon_align_2');
+            ?>
+                <div class="overlay__grid__wrap__item <?php
+                                                        if ($card__empty__bg2 == true) {
+                                                            echo ' overlay__grid__wrap__item--empty--card3 ';
+                                                        }
 
-        alt=""
+                                                        if ($card__diagonal__line2 == true && $card__diagonal__line__type2 == true) {
+                                                            echo ' overlay__grid__wrap__item--lines ';
+                                                        } else if ($card__diagonal__line2 == true && $card__diagonal__line__type2 == false) {
+                                                            echo ' overlay__grid__wrap__item--lines2 ';
+                                                        }
+                                                        ?>
+                                                     
+                                                        " style="--card-bg: <?php echo $card__background__color2;
+                                                                            ?>;--line-color:<?php echo $card__diagonal__line__color2 ?>;
+                                                                            --empty-color:<?php echo $card__empty__bg__color2 ?>
+                                                                            
+                                                        ">
+                    <?php if ($card__background__image2) : ?>
+                        <img src="<?php echo esc_url($card__background__image2['url']); ?>" alt="<?php if ($card__background__image2) {
+                                                                                                        echo esc_attr($card__background__image2['alt']);
+                                                                                                    } ?>" class="overlay__grid__wrap__item__bg" />
+                    <?php endif; ?>
 
-        class="overlay__grid__wrap__item__bg" />
+                    <div class="overlay__grid__wrap__item__header">
+                        <?php if ($card__type2 == true) : ?>
+                            <?php if ($card__title2) : ?>
+                                <h3>
+                                    <?php
+                                    if ($card__counter2 == true) :
+                                    ?>
+                                        <span class="counters" data-number="<?php echo $card__title2; ?>">
+                                        <?php endif; ?>
+                                        <?php echo $card__title2; ?>
+                                        <?php if ($card__counter2 == true) : ?>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php echo $card__title__postfix2; ?>
+                                </h3>
+                            <?php endif; ?>
 
-      <div class="overlay__grid__wrap__item__header">
+                            <?php if ($card__subtitle2) : ?>
+                                <h5 class="<?php if ($card__subtitle__color__white2 == true) {
+                                                echo 'text-white';
+                                            } ?>"><?php echo $card__subtitle2; ?></h5>
+                            <?php endif; ?>
+                        <?php else : ?>
 
-        <h3></h3>
 
-        <h5></h5>
 
-      </div>
+                            <?php if (have_rows('card_carousel_2')) : ?>
+                                <div class="custom__hero__carousel">
+                                    <?php $card__carousel__index2 = 1;
+                                    while (have_rows('card_carousel_2')) : the_row();
+                                        $card__title2 = get_sub_field('title');
+                                        $card__title__postfix2 = get_sub_field('title_postfix');
+                                        $card__subtitle2 = get_sub_field('subtitle');
+                                        $card__icon2 = get_sub_field('icon');
+                                    ?>
+                                        <div class="custom__hero__carousel__item  <?php if ($card__carousel__index2 != 1) {
+                                                                                        echo 'hidden';
+                                                                                    } ?>">
+                                            <?php if ($card__title2) : ?>
+                                                <h3>
+                                                    <?php if ($card__counter2 == true) : ?>
+                                                        <span class="counters" data-number="<?php echo $card__title2; ?>">
+                                                        <?php endif; ?>
+                                                        <?php echo $card__title2; ?>
+                                                        <?php if ($card__counter2 == true) : ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <?php echo $card__title__postfix2; ?>
+                                                </h3>
+                                            <?php endif; ?>
+                                            <?php if ($card__subtitle2) : ?>
+                                                <h5 class="<?php if ($card__subtitle__color__white2 == true) {
+                                                                echo 'text-white';
+                                                            } ?>"><?php echo $card__subtitle2; ?></h5>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php $card__carousel__index2++;
+                                    endwhile; ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
 
-      <div class="overlay__grid__wrap__item__footer__icon ms-auto">
+                    </div>
 
-        <img src="./uploads/og/og2i2.png" alt="" />
+                    <div class="overlay__grid__wrap__item__footer__icon <?php if ($card__icon__align2 == true) {
+                                                                            echo ' ms-auto ';
+                                                                        } ?>">
+                        <?php if ($card__type2 == true) : ?>
+                            <img src="<?php echo esc_url($card__singleicon2['url']); ?>" alt="<?php if ($card__singleicon2) {
+                                                                                                    echo esc_attr($card__singleicon2['alt']);
+                                                                                                } ?>" />
+                        <?php else : ?>
 
-      </div>
+                            <?php if (have_rows('card_carousel')) : ?>
+                                <div class="overlay__grid__wrap__item__footer__icon__carousel">
+                                    <?php $card__icon__carousel__index2 = 1;
+                                    while (have_rows('card_carousel')) : the_row();
+                                        $cardicon2 = get_sub_field('icon');
+                                    ?>
+                                        <div class="overlay__grid__wrap__item__footer__icon__carousel__item <?php if ($card__icon__carousel__index2 != 1) {
+                                                                                                                echo 'hidden';
+                                                                                                            } ?> ">
+                                            <img src="<?php echo esc_url($cardicon2['url']); ?>" alt="<?php echo esc_attr($cardicon2['alt']); ?>" />
+                                        </div>
+                                    <?php $card__icon__carousel__index2++;
+                                    endwhile; ?>
+                                </div>
+                            <?php endif; ?>
 
-    </div>
 
-    <div class="overlay__grid__wrap__item" style="--card-bg: #007948">
+                        <?php endif; ?>
 
-      <img
+                    </div>
 
-        src="./uploads/og/og11.png"
+                </div>
+            <?php endwhile; ?>
+        </div>
+    <?php endif; ?>
 
-        alt=""
-
-        class="overlay__grid__wrap__item__bg" />
-
-      <div class="overlay__grid__wrap__item__header">
-
-        <h3></h3>
-
-        <h5></h5>
-
-      </div>
-
-   
-
-    </div>
-
-    <div
-
-      class="overlay__grid__wrap__item overlay__grid__wrap__item--empty--card3 overlay__grid__wrap__item--lines"
-
-      style="--card-bg: #; --line-color: #007cad; --empty-color: #79be43"></div>
-
-    <div
-
-      class="overlay__grid__wrap__item overlay__grid__wrap__item--lines2"
-
-      style="--card-bg: #24b04b; --line-color: #6ed15f">
-
-      <div class="overlay__grid__wrap__item__header">
-
-        <h3></h3>
-
-        <h5></h5>
-
-      </div>
-
-      <div class="overlay__grid__wrap__item__footer__icon">
-
-        <img src="./uploads/og/ogi22.png" alt="" />
-
-      </div>
-
-    </div>
-
-  </div> -->
 </section>
+
 <section class="stories__module">
     <div class="container">
-        <h2 class="title__primary text-center">Stories</h2>
+        <h2 class="title__primary text-center"><?php the_field("stories_title"); ?></h2>
         <h5 class="sub__title text-center mw-75 mx-auto">
-
-            Rhoncus morbi et augue nec, in id ullamcorper at sit. Condimentum sit nunc
-
-            in eros scelerisque sed. Commodo in viverra nunc, ullamcorper ut. Non,
-
-            amet, aliquet scelerisque nullam sagittis, pulvinar.
-
+            <?php the_field("stories_subtitle"); ?>
         </h5>
+        <?php
+        $grid1 = get_field("stories_grid_item1");
+        $grid2 = get_field("stories_grid_item_2");
+        $grid3 = get_field("stories_grid_text_content");
+        ?>
         <div class="stories__module__grid">
-            <a class="stories__module__grid__item" data-fancybox data-type="iframe" data-src="https://www.youtube.com/embed/FwKe2F7gxNw" href="javascript:;">
+            <a class="stories__module__grid__item" data-fancybox data-type="iframe" data-src="<?php echo $grid1['video_link']; ?>" href="javascript:;">
 
-                <h5>Video: Learn more about IFFCO</h5>
+                <h5><?php echo $grid1['title']; ?></h5>
 
-                <img src="./uploads/home/p1.png" alt="Video Thumbnail" />
+                <img src="<?php echo esc_url($grid1['background_image']['url']); ?>" alt="<?php echo esc_attr($grid1['background_image']['alt']); ?>" />
 
                 <svg width="123" height="123" viewBox="0 0 123 123" fill="none" xmlns="http://www.w3.org/2000/svg">
 
@@ -525,11 +619,11 @@
 
             </a>
             <div class="stories__module__grid__item">
-                <h2>Investing in the future by delivering great brands</h2>
+                <h2><?php echo $grid3; ?></h2>
             </div>
-            <a class="stories__module__grid__item" data-fancybox data-type="iframe" data-src="https://www.youtube.com/embed/FwKe2F7gxNw" href="javascript:;">
+            <a class="stories__module__grid__item" data-fancybox data-type="iframe" data-src="<?php echo $grid2['video_link2']; ?>" href="javascript:;">
 
-                <img src="./uploads/home/p2.png" alt="Video Thumbnail" />
+                <img src="<?php echo esc_url($grid2['background_image2']['url']); ?>" alt="<?php echo esc_attr($grid2['background_image2']['alt']); ?>" />
 
                 <svg width="123" height="123" viewBox="0 0 123 123" fill="none" xmlns="http://www.w3.org/2000/svg">
 
@@ -539,151 +633,295 @@
 
             </a>
         </div>
-        <a href="#" class="cta__primary mx-auto">Press & media
 
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
-            </svg>
-        </a>
+        <?php
+        $storiesCTA = get_field('stories_cta');
+        if ($storiesCTA) :
+            $link_url = $storiesCTA['url'];
+            $link_title = $storiesCTA['title'];
+            $link_target = $storiesCTA['target'] ? $storiesCTA['target'] : '_self';
+        ?>
+            <a class="cta__primary mx-auto" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                    <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
+                </svg></a>
+        <?php endif; ?>
+
     </div>
 </section>
-<section class="hero__banner hero__banner--inverted" style="--bg-color: #03afcc">
+
+
+
+
+
+<section class="hero__banner <?php
+                                $banner__bg__color3 = get_field("banner_background_color_3");
+                                $banner__title3 = get_field("banner_title_3");
+                                $banner__subtitle3 = get_field("banner_subtitle_3");
+                                $banner__subtitle_bold3 = get_field("banner_subtitle_bold_3");
+                                $banner__image__type3 = get_field("banner_content_type_image_3");
+                                $banner__image3 = get_field("banner_content_image_3");
+                                $banner__image__url3 = $banner__image3 ? esc_url($banner__image3['url']) : null;
+                                $banner__background__image3 = get_field("banner_background_image_3");
+                                $banner__background__image__url3 = esc_url($banner__background__image3['url']);
+
+                                $static__banner3 = get_field('banner_background_static_image_3');
+                                $inverted__banner3 = get_field('banner_inverted_3');
+                                $with__image3 = get_field('banner_content_type_image_3');
+                                $sustainability__banner3 = get_field('banner_for_sustainability_page_3');
+                                $traceability__banner3 = get_field('banner_for_traceable_score_page_#');
+
+                                if ($static__banner3 == true) {
+                                    echo ' hero__banner--static--img ';
+                                }
+
+                                if ($inverted__banner3 == true) {
+                                    echo ' hero__banner--inverted ';
+                                }
+                                if ($with__image3 == true) {
+                                    echo ' hero__banner--with--image ';
+                                }
+                                if ($sustainability__banner3 == true) {
+                                    echo ' hero__banner--sustainability ';
+                                }
+                                if ($traceability__banner3 == true) {
+                                    echo ' hero__banner--traceable--score ';
+                                }
+                                ?>
+                                " style="--bg-color: <?php echo $banner__bg__color3; ?>;">
+
+    <?php if ($traceability__banner3 == true) : ?>
+        <span class="float__element"></span>
+    <?php endif; ?>
+
+
     <div class="container">
         <div class="hero__banner__content">
-            <h1>Partner with IFFCO</h1>
-            <p>
-                <strong>
 
-                    Our leadership position in multiple brands across categories is built
 
-                    on innovation and research that leverages a deep understanding of
+            <?php if ($banner__image3 && $banner__image__type3 == true) : ?>
+                <img src="<?php echo $banner__image__url3; ?>" alt="<?php if ($banner__image3) {
+                                                                        echo esc_attr($banner__image3['alt']);
+                                                                    } ?>" />
+            <?php endif; ?>
+            <?php if ($banner__title3) : ?>
+                <h1>
+                    <?php echo $banner__title3; ?>
+                </h1>
+            <?php endif; ?>
 
-                    consumer preferences.
+            <?php if ($banner__subtitle3) : ?>
+                <p>
+                    <?php if ($banner__subtitle_bold3 == true) {
+                        echo "<strong>";
+                    } ?>
+                    <?php echo $banner__subtitle3; ?>
+                    <?php if ($banner__subtitle_bold3 == true) {
+                        echo "</strong>";
+                    } ?>
+                </p>
+            <?php endif; ?>
 
-                </strong>
-            </p>
-            <div class="hero__banner__content__btn__wrap">
-                <a href="#" class="cta__primary">Discover more
 
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <?php if (have_rows('banner_cta_row_3')) : ?>
+                <div class="hero__banner__content__btn__wrap">
+                    <?php while (have_rows('banner_cta_row_3')) : the_row();
+                        $cta3 = get_sub_field('cta');
+                        $link_url = $cta3['url'];
+                        $link_title = $cta3['title'];
+                        $link_target = $cta3['target'] ? $cta3['target'] : '_self';
+                    ?>
+                        <a class="cta__primary cta__primary--light-" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                        <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
-                    </svg>
-                </a>
-            </div>
+                                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
+                            </svg></a>
+
+                    <?php endwhile; ?>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
-    <img src="./uploads/home/bg3.png" alt="" />
-    <!-- <div class="overlay__grid__wrap">
+    <img src="<?php echo esc_url($banner__background__image3['url']); ?>" alt="<?php if ($banner__background__image3) {
+                                                                                    echo esc_attr($banner__background__image3['alt']);
+                                                                                } ?>" />
 
-    <div class="overlay__grid__wrap__item" style="--card-bg: #ffc805">
 
-    
 
-      <div class="overlay__grid__wrap__item__header">
+    <?php if (have_rows('banner_flexi_cards_3')) : ?>
+        <div class="overlay__grid__wrap">
+            <?php while (have_rows('banner_flexi_cards_3')) : the_row();
+                $card__background__image3 = get_sub_field('card_background_image_3');
+                $card__background__color3 = get_sub_field('card_background_color_3');
+                $card__type3 = get_sub_field('card_type_3');
+                $card__carousel3 = get_sub_field('card_carousel_3');
+                $card__title3 = get_sub_field('title_3');
+                $card__subtitle3 = get_sub_field('subtitle_3');
+                $card__subtitle__color__white3 = get_sub_field('subtitle_color_white_3');
+                $card__counter3 = get_sub_field('card_counter_3');
+                $card__title__postfix3 = get_sub_field('card_title_postfix_3');
+                $card__singleicon3 = get_sub_field('single_icon_3');
+                $card__diagonal__line3 = get_sub_field('diagonal_line_3');
+                $card__diagonal__line__type3 = get_sub_field('diagonal_line_type_3');
+                $card__diagonal__line__color3 = get_sub_field('diagonal_line_color_3');
+                $card__empty__bg3 = get_sub_field('empty_placeholder_3');
+                $card__empty__bg__color3 = get_sub_field('empty_placeholder_color_3');
+                $card__icon__align3 = get_sub_field('card_icon_align_3');
+            ?>
+                <div class="overlay__grid__wrap__item <?php
+                                                        if ($card__empty__bg3 == true) {
+                                                            echo ' overlay__grid__wrap__item--empty--card3 ';
+                                                        }
 
-        <h3></h3>
+                                                        if ($card__diagonal__line3 == true && $card__diagonal__line__type3 == true) {
+                                                            echo ' overlay__grid__wrap__item--lines ';
+                                                        } else if ($card__diagonal__line3 == true && $card__diagonal__line__type3 == false) {
+                                                            echo ' overlay__grid__wrap__item--lines2 ';
+                                                        }
+                                                        ?>
+                                                     
+                                                        " style="--card-bg: <?php echo $card__background__color3;
+                                                                            ?>;--line-color:<?php echo $card__diagonal__line__color3 ?>;
+                                                                            --empty-color:<?php echo $card__empty__bg__color3 ?>
+                                                                            
+                                                        ">
+                    <?php if ($card__background__image3) : ?>
+                        <img src="<?php echo esc_url($card__background__image3['url']); ?>" alt="<?php if ($card__background__image3) {
+                                                                                                        echo esc_attr($card__background__image3['alt']);
+                                                                                                    } ?>" class="overlay__grid__wrap__item__bg" />
+                    <?php endif; ?>
 
-        <h5></h5>
+                    <div class="overlay__grid__wrap__item__header">
+                        <?php if ($card__type3 == true) : ?>
+                            <?php if ($card__title3) : ?>
+                                <h3>
+                                    <?php
+                                    if ($card__counter3 == true) :
+                                    ?>
+                                        <span class="counters" data-number="<?php echo $card__title3; ?>">
+                                        <?php endif; ?>
+                                        <?php echo $card__title3; ?>
+                                        <?php if ($card__counter3 == true) : ?>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php echo $card__title__postfix3; ?>
+                                </h3>
+                            <?php endif; ?>
 
-      </div>
+                            <?php if ($card__subtitle3) : ?>
+                                <h5 class="<?php if ($card__subtitle__color__white3 == true) {
+                                                echo 'text-white';
+                                            } ?>"><?php echo $card__subtitle3; ?></h5>
+                            <?php endif; ?>
+                        <?php else : ?>
 
-      <div class="overlay__grid__wrap__item__footer__icon">
 
-        <img src="./uploads/og/1.png" alt="" />
 
-      </div>
+                            <?php if (have_rows('card_carousel_3')) : ?>
+                                <div class="custom__hero__carousel">
+                                    <?php $card__carousel__index3 = 1;
+                                    while (have_rows('card_carousel_3')) : the_row();
+                                        $card__title3 = get_sub_field('title');
+                                        $card__title__postfix3 = get_sub_field('title_postfix');
+                                        $card__subtitle3 = get_sub_field('subtitle');
+                                        $card__icon3 = get_sub_field('icon');
+                                    ?>
+                                        <div class="custom__hero__carousel__item  <?php if ($card__carousel__index3 != 1) {
+                                                                                        echo 'hidden';
+                                                                                    } ?>">
+                                            <?php if ($card__title3) : ?>
+                                                <h3>
+                                                    <?php if ($card__counter3 == true) : ?>
+                                                        <span class="counters" data-number="<?php echo $card__title3; ?>">
+                                                        <?php endif; ?>
+                                                        <?php echo $card__title3; ?>
+                                                        <?php if ($card__counter3 == true) : ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <?php echo $card__title__postfix3; ?>
+                                                </h3>
+                                            <?php endif; ?>
+                                            <?php if ($card__subtitle3) : ?>
+                                                <h5 class="<?php if ($card__subtitle__color__white3 == true) {
+                                                                echo 'text-white';
+                                                            } ?>"><?php echo $card__subtitle3; ?></h5>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php $card__carousel__index3++;
+                                    endwhile; ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
 
-    </div>
+                    </div>
 
-    <div class="overlay__grid__wrap__item" style="--card-bg: #03afcc">
+                    <div class="overlay__grid__wrap__item__footer__icon <?php if ($card__icon__align3 == true) {
+                                                                            echo ' ms-auto ';
+                                                                        } ?>">
+                        <?php if ($card__type3 == true) : ?>
+                            <img src="<?php echo esc_url($card__singleicon3['url']); ?>" alt="<?php if ($card__singleicon3) {
+                                                                                                    echo esc_attr($card__singleicon3['alt']);
+                                                                                                } ?>" />
+                        <?php else : ?>
 
-      <img
+                            <?php if (have_rows('card_carousel_3')) : ?>
+                                <div class="overlay__grid__wrap__item__footer__icon__carousel">
+                                    <?php $card__icon__carousel__index3 = 1;
+                                    while (have_rows('card_carousel_3')) : the_row();
+                                        $cardicon3 = get_sub_field('icon');
+                                    ?>
+                                        <div class="overlay__grid__wrap__item__footer__icon__carousel__item <?php if ($card__icon__carousel__index3 != 1) {
+                                                                                                                echo 'hidden';
+                                                                                                            } ?> ">
+                                            <img src="<?php echo esc_url($cardicon['url']); ?>" alt="<?php echo esc_attr($cardicon3['alt']); ?>" />
+                                        </div>
+                                    <?php $card__icon__carousel__index3++;
+                                    endwhile; ?>
+                                </div>
+                            <?php endif; ?>
 
-        src="./uploads/og/22.png"
 
-        alt=""
+                        <?php endif; ?>
 
-        class="overlay__grid__wrap__item__bg" />
+                    </div>
 
-      <div class="overlay__grid__wrap__item__header">
+                </div>
+            <?php endwhile; ?>
+        </div>
+    <?php endif; ?>
 
-        <h3></h3>
-
-        <h5></h5>
-
-      </div>
-
-      <div class="overlay__grid__wrap__item__footer__icon">
-
-        <img src="./uploads/og/2.png" alt="" />
-
-      </div>
-
-    </div>
-
-    <div class="overlay__grid__wrap__item" style="--card-bg: #03afcc">
-
-      <img
-
-        src="./uploads/og/33.png"
-
-        alt=""
-
-        class="overlay__grid__wrap__item__bg" />
-
-      <div class="overlay__grid__wrap__item__header">
-
-        <h3></h3>
-
-        <h5></h5>
-
-      </div>
-
-      <div class="overlay__grid__wrap__item__footer__icon">
-
-        <img src="./uploads/og/41.png" alt="" />
-
-      </div>
-
-    </div>
-
-    <div class="overlay__grid__wrap__item" style="--card-bg: #03afcc">
-
-      <img
-
-        src="./uploads/og/4.png"
-
-        alt=""
-
-        class="overlay__grid__wrap__item__bg" />
-
-    </div>
-
-  </div> -->
 </section>
-<section class="enduring__values" style="--bg-color: #f7f6f6">
+<?php
+$ev__bg = get_field('enduring_values_banner_background_color', 'option');
+$ev__title = get_field('enduring_values_banner_title', 'option');
+$ev__desc = get_field('enduring_values_banner_description', 'option');
+$ev__cta = get_field('enduring_values_banner_cta', 'option');
+?>
+<section class="enduring__values" style="--bg-color:<?php echo $ev__bg; ?> ">
     <div class="container">
         <h2 class="title__secondary text-center">
 
-            Enduring values, enhancing lives
+            <?php echo $ev__title; ?>
 
         </h2>
         <h5 class="sub__title text-center">
 
-            The preferred of sustainable value-added products and services for
-
-            everyone, everywhere & every day.
+            <?php echo $ev__desc; ?>
 
         </h5>
-        <a href="#" class="cta__primary mx-auto">The IFFCO values system
+        <?php
+        if ($ev__cta) :
+            $link_url = $ev__cta['url'];
+            $link_title = $ev__cta['title'];
+            $link_target = $ev__cta['target'] ? $ev__cta['target'] : '_self';
+        ?>
+            <a class="cta__primary mx-auto" href="<?php echo esc_url($link_url); ?>" target="<?php echo esc_attr($link_target); ?>"><?php echo esc_html($link_title); ?> <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
+                </svg></a>
+        <?php endif; ?>
 
-                <path d="M10.586 5.657L6.636 1.707C6.45384 1.51839 6.35305 1.26579 6.35533 1.00359C6.3576 0.741397 6.46277 0.490585 6.64818 0.305177C6.83359 0.119768 7.0844 0.0145995 7.3466 0.0123211C7.6088 0.0100427 7.8614 0.110837 8.05 0.292995L13.707 5.95C13.8002 6.04265 13.8741 6.15281 13.9246 6.27414C13.9751 6.39548 14.001 6.52559 14.001 6.657C14.001 6.7884 13.9751 6.91852 13.9246 7.03985C13.8741 7.16118 13.8002 7.27134 13.707 7.364L8.05 13.021C7.95775 13.1165 7.84741 13.1927 7.7254 13.2451C7.6034 13.2975 7.47218 13.3251 7.3394 13.3262C7.20662 13.3274 7.07494 13.3021 6.95205 13.2518C6.82915 13.2015 6.7175 13.1273 6.62361 13.0334C6.52971 12.9395 6.45546 12.8278 6.40518 12.7049C6.3549 12.5821 6.3296 12.4504 6.33075 12.3176C6.3319 12.1848 6.35949 12.0536 6.4119 11.9316C6.46431 11.8096 6.54049 11.6992 6.636 11.607L10.586 7.657H1C0.734784 7.657 0.48043 7.55164 0.292893 7.3641C0.105357 7.17657 0 6.92221 0 6.657C0 6.39178 0.105357 6.13742 0.292893 5.94989C0.48043 5.76235 0.734784 5.657 1 5.657H10.586Z" fill="white" />
-            </svg>
-        </a>
     </div>
 </section>
 <?php get_footer(); ?>
