@@ -207,7 +207,7 @@
                     <div class="overlay__grid__wrap__item__footer__icon <?php if ($card__icon__align == true) {
                                                                             echo ' ms-auto ';
                                                                         } ?>">
-                        <?php if ($card__type == true) : ?>
+                        <?php if ($card__type == true && $card__singleicon) : ?>
                             <img src="<?php echo esc_url($card__singleicon['url']); ?>" alt="<?php if ($card__singleicon) {
                                                                                                     echo esc_attr($card__singleicon['alt']);
                                                                                                 } ?>" />
@@ -893,10 +893,10 @@
 
 </section>
 <?php
-$ev__bg = get_field('enduring_values_banner_background_color', 'option');
-$ev__title = get_field('enduring_values_banner_title', 'option');
-$ev__desc = get_field('enduring_values_banner_description', 'option');
-$ev__cta = get_field('enduring_values_banner_cta', 'option');
+$ev__bg = get_field('enduring_values_banner_background_color');
+$ev__title = get_field('enduring_values_banner_title');
+$ev__desc = get_field('enduring_values_banner_description');
+$ev__cta = get_field('enduring_values_banner_cta');
 ?>
 <section class="enduring__values" style="--bg-color:<?php echo $ev__bg; ?> ">
     <div class="container">
